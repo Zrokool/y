@@ -3,25 +3,36 @@ import UserNotifications
 
 struct ContentView: View {
     @State private var lunchTime = Date()
+    @State private var navigateToCountdown = false
 
     var body: some View {
-        VStack {
-            DatePicker("Select Lunch Time", selection: $lunchTime, displayedComponents: .hourAndMinute)
-                .datePickerStyle(WheelDatePickerStyle())
-                .labelsHidden()
-                .padding()
-
-            Button(action: scheduleNotification) {
-                Text("Set Lunch Reminder")
-                    .font(.headline)
+        NavigationView {
+            VStack {
+                DatePicker("Select Lunch Time", selection: $lunchTime, displayedComponents: .hourAndMinute)
+                    .datePickerStyle(WheelDatePickerStyle())
+                    .labelsHidden()
                     .padding()
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
+
+                Button(action: {
+                    scheduleNotification()
+                    navigateToCountdown = true
+                }) {
+                    Text("Set Lunch Reminder")
+                        .font(.headline)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                .background(
+                    NavigationLink(destination: CountdownView(targetDate: lunchTime), isActive: $navigateToCountdown) {
+                        EmptyView()
+                    }.hidden()
+                )
             }
-        }
-        .onAppear {
-            requestNotificationPermissions()
+            .onAppear {
+                requestNotificationPermissions()
+            }
         }
     }
 
